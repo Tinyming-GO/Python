@@ -129,13 +129,16 @@ def func(page):
     items = re.findall(r'"type":"(.*?)","codeType".*?"contentHtml":"(.*?)","data".*?"categorySet":"(.*?)","hasMore"',
                        content)  # 正则匹配
     if len(items) == 0:
-        print "The End Page:", page
+        print
+        "The End Page:", page
         data = urllib.urlencode(data)  # 编码工作，由dict转为string
         full_url = url + '?' + data
-        print full_url
+        print
+        full_url
         sys.exit(0)  # 无错误退出
     else:
-        print "The Page:", page, "Downloading..."
+        print
+        "The Page:", page, "Downloading..."
         for item in items:
             ContentSave(item)
 
@@ -168,16 +171,20 @@ if __name__ == '__main__':
             r'"type":"(.*?)","codeType".*?"contentHtml":"(.*?)","data".*?"categorySet":"(.*?)","hasMore"',
             content)  # 正则匹配
         if len(items) == 0:
-            print "The End Page:", page
+            print
+            "The End Page:", page
             data = urllib.urlencode(data)  # 编码工作，由dict转为string
             full_url = url + '?' + data
-            print full_url
+            print
+            full_url
             break
         else:
-            print "The Page:", page, "Downloading..."
+            print
+            "The Page:", page, "Downloading..."
             for item in items:
                 ContentSave(item)
             page += 1
 
     end = datetime.datetime.now()
-    print "last time: ", end - start
+    print
+    "last time: ", end - start
