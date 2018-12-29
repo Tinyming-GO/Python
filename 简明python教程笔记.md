@@ -494,3 +494,420 @@ $ python function_docstring.py
 强烈推荐你为你编写的所有重要的函数配以文档字符串。
 
 # 模块
+
+如何使用标准库模块：
+
+```python
+import sys
+
+print('The command line arguments are:')
+for i in sys.argv:
+    print(i)
+print('\n\nThe PYTHONPATH is', sys.path, '\n')
+```
+
+输出:
+
+```
+$ python module_using_sys.py we are arguments
+The command line arguments are:
+module_using_sys.py
+we
+are
+arguments
+The PYTHONPATH is ['/tmp/py',
+# many entries here, not shown here
+'/Library/Python/2.7/site-packages',
+'/usr/local/lib/python2.7/site-packages']
+```
+
+当 Python 运行 import sys 这一语句时,它会开始寻找 sys 模块。在这一案例中,由于其是一个内置模块,因此 Python 知道应该在哪里找到它。如果它不是一个已编译好的模块,即用 Python 编写的模块,那么 Python 解释器将从它的`sys.path`变量所提供的目录中进行搜索。
+
+※ sys.path 内包含了导入模块的字典名称列表！！
+
+另外要注意的是当前目录指的是程序启动的目录。你可以通过运行`import os; print(os.getcwd())`来查看你的程序目前所处在的目录。
+
+## 按字节码编译的 .pyc 文件
+
+注意:这些 .pyc 文件通常会创建在与对应的 .py 文件所处的目录中。如果 Python 没有相应的权限对这一目录进行写入文件的操作,那么 .pyc 文件将不会被创建。
+
+## from..import 语句
+
+如果你希望直接将`argv`变量导入你的程序(为了避免每次都要输入`sys.`),那么你可以通过使用`from sys import argv`语句来实现这一点。
+
+- 警告:一般来说,你应该尽量避免使用 from...import 语句,而去使用 import 语句。这是为了避免在你的程序中出现名称冲突,同时也为了使程序更加易读。
+
+案例:
+
+```python
+from math import sqrt
+
+print("Square	root	of	16	is", sqrt(16))
+```
+
+## 模块的 __name__
+
+```python
+if __name__ == '__main__':
+    print('This program is being run by itself')
+else:
+    print('I am being imported from another module')
+```
+
+输出:
+
+```
+$ python module_using_name.py
+This program is being run by itself
+
+$ python
+>>> import module_using_name
+I am being imported from another module
+>>>
+```
+
+每一个 Python 模块都定义了它的`__name__`属性。如果它与`__main__`属性相同则代表这一模块是由用户独立运行的,因此我们便可以采取适当的行动。
+
+## 编写你自己的模块
+
+你还可以使用:
+
+```python
+from mymodule import * # 这将导入诸如 say_hi 等所有公共名称,但不会导入 __version__ 名称,因为后者以双下划线开头。
+```
+
+## dir 函数
+
+内置的`dir()`函数能够返回由对象所定义的名称列表。 如果这一对象是一个模块,则该列表会包括函数内所定义的函数、类与变量。
+
+该函数接受参数。 如果参数是模块名称,函数将返回这一指定模块的名称列表。 如果没有提供参数,函数将返回当前模块的名称列表。
+
+```python
+$ python
+>>> import sys
+# 给出 sys 模块中的属性名称
+>>> dir(sys)
+['__displayhook__', '__doc__',
+'argv', 'builtin_module_names',
+'version', 'version_info']
+# 此处只展示部分条目
+# 给出当前模块的属性名称
+>>> dir()
+['__builtins__', '__doc__',
+'__name__', '__package__','sys']
+# 创建一个新的变量 'a'
+>>> a = 5
+>>> dir()
+['__builtins__', '__doc__', '__name__', '__package__', 'a']
+# 删除或移除一个名称
+>>> del a
+>>> dir()
+['__builtins__', '__doc__', '__name__', '__package__']
+```
+
+## 包
+
+现在,你必须开始遵守用以组织你的程序的层次结构。变量通常位于函数内部,函数与全局变量通常位于模块内部。如果你希望组织起这些模块的话,应该怎么办?这便是包(Packages)应当登场的时刻。
+
+包是指一个包含模块与一个特殊的`__init__.py`文件的文件夹,后者向 Python 表明这一文件夹是特别的,因为其包含了 Python	模块。
+
+让我们这样设想: 你想创建一个名为“world”的包,其中还包含着 “asia”、“africa” 等其它子包,同时这些子包都包含了诸如“india”、“madagascar”等模块。
+
+下面是你会构建出的文件夹的结构:
+
+```
+- <some folder present in the sys.path>/
+  - world/
+    - __init__.py
+    - asia/
+      - __init__.py
+      - india/
+        - __init__.py
+        - foo.py
+      - africa/
+        - __init__.py
+        - madagascar/
+          - __init__.py
+          - bar.py
+```
+
+包是一种能够方便地分层组织模块的方式。你将在 标准库 中看到许多有关于此的实例。
+
+# 数据结构
+
+Python	中有四种内置的数据结构——`列表(List)`、`元组(Tuple)`、`字典(Dictionary)`和`集合(Set)`。
+
+## 列表
+
+列表是一种可变的(Mutable)数据类型
+
+```python
+# This is my shopping list
+shoplist = ['apple', 'mango', 'carrot', 'banana'] # 你可以向列表中添加任何类型的对象,包括数字,甚至是其它列表。
+print('I have', len(shoplist), 'items to purchase.')
+
+print('These items are:', end=' ')
+for item in shoplist: # 使用 for...in 循环来遍历列表中的每一个项目。
+    print(item, end=' ') # 使用 end 参数,这样就能通过一个空格来结束输出工作,而不是通常的换行。
+
+print('\nI also have to buy rice.')
+shoplist.append('rice') # 通过列表对象中的 append 方法向列表中添加一个对象。
+print('My shopping list is now', shoplist)
+
+print('I will sort my list now')
+shoplist.sort()  # 列表的 sort 方法对列表进行排序。这里要着重理解到这一方法影响到的是列表本身,而不会返回一个修改过的列表——这与修改字符串的方式并不相同。同时,这也是我们所说的,列表是可变的(Mutable)而字符串是不可变的(Immutable)。
+print('Sorted shopping list is', shoplist)
+
+print('The first item I will buy is', shoplist[0])
+olditem = shoplist[0]
+del shoplist[0]
+print('I bought the', olditem)
+print('My shopping list is now', shoplist)
+```
+
+输出:
+
+```
+$ python ds_using_list.py
+I have 4 items to purchase.
+These items are: apple mango carrot banana
+I also have to buy rice.
+My shopping list is now ['apple', 'mango', 'carrot', 'banana', 'rice']
+I will sort my list now
+Sorted shopping list is ['apple', 'banana', 'carrot', 'mango', 'rice']
+The first item I will buy is apple
+I bought the apple
+My shopping list is now ['banana', 'carrot', 'mango', 'rice']
+```
+
+## 有关对象与类的快速介绍
+
+列表是使用对象与类的实例。当我们启用一个变量`i`并将整数 5 赋值给它时,你可以认为这是在创建一个`int`类(即类型)之下的对象(即实例)`i`。
+
+## 元组
+
+元组的一大特征类似于字符串,它们是不可变的,也就是说,你不能编辑或更改元组。
+
+```python
+#	我会推荐你总是使用括号
+#	来指明元组的开始与结束
+#	尽管括号是一个可选选项。
+#	明了胜过晦涩,显式优于隐式。
+zoo = ('python', 'elephant', 'penguin')  # 这是一个元组
+print('Number	of	animals	in	the	zoo	is', len(zoo)) # `len`函数用来获取元组的长度。
+
+new_zoo = 'monkey', 'camel', zoo
+print('Number	of	cages	in	the	new	zoo	is', len(new_zoo))
+print('All	animals	in	new	zoo	are', new_zoo)
+print('Animals	brought	from	old	zoo	are', new_zoo[2]) # 使用方括号的形式被称作索引(Indexing)运算符
+print('Last	animal	brought	from	old	zoo	is', new_zoo[2][2]) # new_zoo 元组中的第三个项目中的第三个项目
+print('Number	of	animals	in	the	new	zoo	is',
+      len(new_zoo) - 1 + len(new_zoo[2]))
+```
+
+输出:
+
+```
+$ python ds_using_tuple.py
+Number of animals in the zoo is 3
+Number of cages in the new zoo is 3
+All animals in new zoo are ('monkey', 'camel', ('python', 'elephant', 'penguin'))
+Animals brought from old zoo are ('python', 'elephant', 'penguin')
+Last animal brought from old zoo is penguin
+Number of animals in the new zoo is 5
+```
+
+- 包含 0 或 1 个项目的元组
+- - 一个空的元组由一对圆括号构成,就像`myempty = ()`这样。然而,一个只拥有一个项目的元组并不像这样简单。你必须在第一个(也是唯一一个)项目的后面加上一个逗号来指定它,如此一来 Python 才可以识别出在这个表达式想表达的究竟是一个元组还是只是一个被括号所环绕的对象,也就是说,如果你想指定一个包含项目 2 的元组,你必须指定`singleton = (2, )`。
+
+## 字典
+
+通过使用符号构成`d = {key : value1 , key2 : value2}`这样的形式,来成对地指定键值与值。
+
+```python
+# “ab”是地址(Address)簿(Book)的缩写
+
+ab = {
+    'Swaroop': 'swaroop@swaroopch.com',
+    'Larry': 'larry@wall.org',
+    'Matsumoto': 'matz@ruby-lang.org',
+    'Spammer': 'spammer@hotmail.com'
+}
+
+print("Swaroop's address is", ab['Swaroop'])
+
+# 删除一对键值—值配对
+del ab['Spammer']
+
+print('\nThere are {} contacts in the address-book\n'.format(len(ab)))
+
+for name, address in ab.items(): # 字典的items()方法将返回一份包含元组的列表，每一元组中则包含了每一对相应的信息——键值以及其相应的值。
+    print('Contact {} at {}'.format(name, address))
+
+# 添加一对键值—值配对
+ab['Guido'] = 'guido@python.org'
+
+if 'Guido' in ab: # 使用`in`运算符来检查某对键值—值配对是否存在。
+    print("\nGuido's address is", ab['Guido'])
+```
+
+输出:
+
+```
+$ python ds_using_dict.py
+Swaroop's address is swaroop@swaroopch.com
+There are 3 contacts in the address-book
+Contact Swaroop at swaroop@swaroopch.com
+Contact Matsumoto at matz@ruby-lang.org
+Contact Larry at larry@wall.org
+Guido's address is guido@python.org
+```
+
+要想了解有关`dict`类的更多方法,请参阅`help(dict)`。
+
+## 序列
+
+列表、元组和字符串可以看作序列(Sequence)的某种表现形式。序列的主要功能是资格测试(Membership Test)(也就是 in 与 not	in 表达式)和索引操作(Indexing Operations),它们能够允许我们直接获取序列中的特定项目。
+
+上面所提到的序列的三种形态——列表、元组与字符串,同样拥有一种切片(Slicing)运算符,它能够允许我们序列中的某段切片——也就是序列之中的一部分。
+```python
+shoplist = ['apple', 'mango', 'carrot', 'banana']
+name = 'swaroop'
+# Indexing or 'Subscription' operation	#
+# 索引或“下标(Subscription)”操作符	#
+print('Item 0 is', shoplist[0])
+print('Item 1 is', shoplist[1])
+print('Item 2 is', shoplist[2])
+print('Item 3 is', shoplist[3])
+print('Item -1 is', shoplist[-1])  # 负数从后面开始
+print('Item -2 is', shoplist[-2])
+print('Character 0 is', name[0])
+# Slicing on a list #
+print('Item 1 to 3 is', shoplist[1:3])
+print('Item 2 to end is', shoplist[2:])
+print('Item 1 to -1 is', shoplist[1:-1])
+print('Item start to end is', shoplist[:]) # 切片操作！数字可选，冒号是必填的！中括号！包含开始，不包含结尾！
+# 从某一字符串中切片	#
+print('characters 1 to 3 is', name[1:3])
+print('characters 2 to end is', name[2:])
+print('characters 1 to -1 is', name[1:-1])
+print('characters start to end is', name[:])
+# 修改切片的步长（step）
+print('Item is', shoplist[1:3:2])
+```
+
+输出:
+
+```bash
+$ python ds_seq.py
+Item 0 is apple
+Item 1 is mango
+Item 2 is carrot
+Item 3 is banana
+Item -1 is banana
+Item -2 is carrot
+Character 0 is s
+Item 1 to 3 is ['mango', 'carrot']
+Item 2 to end is ['carrot', 'banana']
+Item 1 to -1 is ['mango', 'carrot']
+Item start to end is ['apple', 'mango', 'carrot', 'banana']
+characters 1 to 3 is wa
+characters 2 to end is aroop
+characters 1 to -1 is waroo
+characters start to end is swaroop
+Item is ['mango']
+```
+
+序列的一大优点在于你可以使用同样的方式访问元组、列表与字符串。
+
+## 集合
+
+```bash
+>>> bri = set(['brazil', 'russia', 'india'])
+>>> 'india' in bri
+True
+>>> 'usa' in bri
+False
+>>> bric = bri.copy()
+>>> bric.add('china')
+>>> bric.issuperset(bri)
+True
+>>> bri.remove('russia')
+>>> bri & bric # OR bri.intersection(bric)
+{'brazil', 'india'}
+```
+
+## 引用
+
+```python
+print('Simple Assignment')
+shoplist = ['apple', 'mango', 'carrot', 'banana']
+# mylist 只是指向同一对象的另一种名称
+mylist = shoplist
+# 我购买了第一项项目,所以我将其从列表中删除
+del shoplist[0]
+print('shoplist is', shoplist)
+print('mylist is', mylist)
+# 注意到	shoplist 和 mylist 二者都
+# 打印出了其中都没有 apple 的同样的列表,以此我们确认
+# 它们指向的是同一个对象
+print('Copy by making a full slice')
+# 通过生成一份完整的切片制作一份列表的副本
+mylist = shoplist[:]
+# 删除第一个项目
+del mylist[0]
+print('shoplist is', shoplist)
+print('mylist is', mylist)
+# 注意到现在两份列表已出现不同
+```
+
+输出:
+
+```
+$ python ds_reference.py
+Simple Assignment
+shoplist is ['mango', 'carrot', 'banana']
+mylist is ['mango', 'carrot', 'banana']
+Copy by	making a full slice
+shoplist is ['mango', 'carrot', 'banana']
+mylist is ['carrot', 'banana']
+```
+
+你要记住如果你希望创建一份诸如序列等复杂对象的副本(而非整数这种简单的对象(Object)),你必须使用切片操作来制作副本。如果你仅仅是将一个变量名赋予给另一个名称,那么它们都将“查阅”同一个对象,如果你对此不够小心,那么它将造成麻烦。
+
+## 有关字符串的更多内容
+
+你在程序中使用的所有字符串都是`str 类`下的对象。你可以查阅`help(str)`。
+
+```python
+# 这是一个字符串对象
+name = 'Swaroop'
+if name.startswith('Swa'):  # startswith 方法用于查找字符串是否以给定的字符串内容开头。
+    print('Yes, the string starts with "Swa"')
+if 'a' in name:   # in 运算符用以检查给定的字符串是否是查询的字符串中的一部分。
+    print('Yes, it contains the string "a"')
+if name.find('war') != -1: # find 方法用于定位字符串中给定的子字符串的位置。
+    print('Yes it contains the string "war"')
+delimiter = '_*_'
+mylist = ['Brazil', 'Russia', 'India', 'China']
+print(delimiter.join(mylist))
+```
+
+输出:
+
+```
+$ python ds_str_methods.py
+Yes, the string starts with "Swa"
+Yes, it contains the string "a"
+Yes, it contains the string "war"
+Brazil_*_Russia_*_India_*_China
+```
+
+# 解决问题
+
+## 文件备份=>backup_ver1.py
+
+## 软件开发流程
+
+# 面向对象编程
+
