@@ -911,3 +911,73 @@ Brazil_*_Russia_*_India_*_China
 
 # 面向对象编程
 
+对象可以使用属于它的普通变量来存储数据。这种从属于对象或类的变量叫作`字段(Field)`。对象还可以使用属于类的函数来实现某些功能,这种函数叫作`类的方法(Method)`。这两个术语很重要,它有助于我们区分`函数与变量`,哪些是独立的,哪些又是属于类或对象的。总之,`字段与方法通称类的属性(Attribute)`。
+
+字段有两种类型——它们属于某一类的各个实例或对象,或是从属于某一类本身。它们被分别称作`实例变量(Instance Variables)`与`类变量(Class Variables)`。
+
+通过`class`关键字可以创建一个类。
+
+## 	self
+
+假设你有一个 MyClass 的类,这个类下有一个实例 myobject 。当你调用一个这个对象的方法,如 myobject.method(arg1,	arg2)		时,Python 将会自动将其转换成 MyClass.method(myobject,	arg1, arg2) ——这就是 self 的全部特殊之处所在。
+
+这同时意味着,如果你有一个没有参数的方法,你依旧必须拥有一个参数——`self`。
+
+## 类
+
+最简单的类(Class):
+
+```python
+class Person:
+    pass  # 一个空的代码块
+
+p = Person()
+print(p)
+```
+
+## 方法
+
+```python
+class Person:
+    def say_hi(self): # 要注意到 say_hi 这一方法不需要参数,但是依旧在函数定义中拥有 self 变量。
+        print('Hello, how are you?')
+
+p = Person()
+p.say_hi()
+#	前面两行同样可以写作
+#	Person().say_hi()
+```
+
+输出:
+
+```
+$ python oop_method.py
+Hello, how are you?
+```
+
+## __init__ 方法
+
+`__init__ 方法`会在类的对象被实例化(Instantiated)时立即运行。
+
+```python
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+    def say_hi(self):
+        print('Hello, my name is', self.name)
+
+p = Person('Swaroop')
+p.say_hi()
+# 前面两行同时也能写作
+# Person('Swaroop').say_hi()
+```
+
+输出:
+
+```
+$ python oop_init.py
+Hello, my name is Swaroop
+```
+
+## 类变量与对象变量
