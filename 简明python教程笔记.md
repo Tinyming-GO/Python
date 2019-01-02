@@ -955,7 +955,7 @@ $ python oop_method.py
 Hello, how are you?
 ```
 
-## __init__ 方法
+## `__init__` 方法
 
 `__init__ 方法`会在类的对象被实例化(Instantiated)时立即运行。
 
@@ -981,3 +981,154 @@ Hello, my name is Swaroop
 ```
 
 ## 类变量与对象变量
+
+```python
+#coding=UTF-8
+class Robot:
+    """表示有一个带有名字的机器人。"""
+
+    #一个类变量,用来计数机器人的数量
+    population = 0
+
+    def __init__(self, name):
+        """初始化数据"""
+        self.name = name   # 这个变量属于对象！！ 注意跟PHP的区别
+        print("(Initializing {})".format(self.name))
+        # 当有人被创建时,机器人
+        # 将会增加人口数量
+        Robot.population += 1  # 这个变量属于类！！ 最好使用self.__class__.population。
+
+    def die(self):
+        """我挂了。"""
+        print("{} is being destroyed!".format(self.name))
+        Robot.population -= 1
+        if Robot.population == 0:
+            print("{} was the last one.".format(self.name))
+        else:
+            print("There are still {:d} robots working.".format(
+                Robot.population))
+
+    def say_hi(self):
+        """来自机器人的诚挚问候
+        没问题,你做得到。"""
+        print("Greetings, my masters call me {}.".format(self.name))
+
+    @classmethod
+    def how_many(cls):  # 定义一个属于类的方法！！
+        """打印出当前的人口数量"""
+        print("We have {:d} robots.".format(cls.population))
+
+droid1 = Robot("R2-D2")
+droid1.say_hi()
+Robot.how_many()
+droid2 = Robot("C-3PO")
+droid2.say_hi()
+Robot.how_many()
+print("\nRobots can do some work here.\n")
+print("Robots have finished their work. So let's destroy them.")
+droid1.die()
+droid2.die()
+Robot.how_many()
+```
+
+输出:
+
+```
+$ python oop_objvar.py
+(Initializing R2-D2)
+Greetings, my masters call me R2-D2.
+We have 1 robots.
+(Initializing C-3PO)
+Greetings, my masters call me C-3PO.
+We have 2 robots.
+Robots can do some work here.
+Robots have finished their work. So let's destroy them.
+R2-D2 is being destroyed!
+There are still 1 robots working.
+C-3PO is being destroyed!
+C-3PO was the last one.
+We have 0 robots.
+```
+
+- 我们通过 `Robot.population` 而非 self.population 引用 population `类变量`。对于类变量，还可以使用`self.__class__.population`
+- 我们对于 name `对象变量`采用 `self.name` 标记法加以称呼。
+- 注意当一个对象变量与一个类变量名称相同时,类变量将会被隐藏。
+- 我们使用装饰器(Decorator)将 how_many 方法标记为类方法。你可以将装饰器想象为调用一个包装器(Wrapper)函数的快捷方式,因此启用 @classmethod 装饰器等价于调用: `how_many	= classmethod(how_many)`
+- 我们可以在运行时通过 `Robot.__doc__` 访问类的 文档字符串,对于方法的文档字符串,则可以使用 `Robot.say_hi.__doc__` 。
+- 所有的类成员都是公开的。但有一个例外:如果你使用数据成员并在其名字中使用双下划线作为前缀,形成诸如 `__privatevar` 这样的形式,Python 会使用名称调整(Name-mangling)来使其有效地成为一个私有变量。
+- 任何在类或对象之中使用的变量其命名应以下划线开头,其它所有非此格式的名称都将是公开的,并可以为其它任何类或对象所使用。请记得这只是一个约定,Python	并不强制如此(除了双下划线前缀这点)。
+
+## 继承
+
+```Python
+# coding=UTF-8
+class SchoolMember:
+    '''代表任何学校里的成员。'''
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        print('(Initialized SchoolMember: {})'.format(self.name))
+
+    def tell(self):  # 这个方法被子类覆盖了，所以没有被调用
+        '''告诉我有关我的细节。'''
+        print('Name:"{}" Age:"{}"'.format(self.name, self.age), end=" ")
+
+
+class Teacher(SchoolMember):  # SchoolMember 被称为 基类/超类 ， Teacher 被称为 子类/派生类
+    '''代表一位老师。'''
+
+    def __init__(self, name, age, salary):
+        SchoolMember.__init__(self, name, age)  # 显式地调用基类的同名方法
+        self.salary = salary
+        print('(Initialized Teacher: {})'.format(self.name))
+
+    def tell(self):
+        SchoolMember.tell(self)
+        print('Salary: "{:d}"'.format(self.salary))
+
+
+class Student(SchoolMember):
+    '''代表一位学生。'''
+
+    def __init__(self, name, age, marks):
+        SchoolMember.__init__(self, name, age)
+        self.marks = marks
+        print('(Initialized Student: {})'.format(self.name))
+
+    def tell(self):
+        SchoolMember.tell(self)
+        print('Marks: "{:d}"'.format(self.marks))
+
+
+t = Teacher('Mrs. Shrividya', 40, 30000)
+s = Student('Swaroop', 25, 75)
+# 打印一行空白行
+print()
+members = [t, s]
+for member in members:
+    # 对全体师生工作
+    member.tell()
+```
+
+输出:
+
+```
+$ python oop_subclass.py
+(Initialized SchoolMember: Mrs. Shrividya)
+(Initialized Teacher: Mrs. Shrividya)
+(Initialized SchoolMember: Swaroop)
+(Initialized Student: Swaroop)
+Name:"Mrs. Shrividya" Age:"40" Salary: "30000"
+Name:"Swaroop" Age:"25" Marks: "75"
+```
+
+这里有一条有关术语的注释——如果继承元组(Inheritance Tuple)中有超过一个类,这种情况就会被称作多重继承(Multiple Inheritance)。
+
+# 输入与输出
+
+
+
+
+
+
