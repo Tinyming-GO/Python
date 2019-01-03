@@ -1127,6 +1127,514 @@ Name:"Swaroop" Age:"25" Marks: "75"
 
 # 输入与输出
 
+## 用户输入内容
+
+```python
+def reverse(text):
+    return text[::-1]  # 使用切片功能翻转文本
+
+def is_palindrome(text):
+    return text == reverse(text)
+
+something = input("Enter text: ")
+if is_palindrome(something):
+    print("Yes, it is a palindrome")
+else:
+    print("No, it is not a palindrome")
+```
+
+输出:
+
+```
+$ python3 io_input.py
+Enter text: sir
+No, it is not a palindrome
+$ python3 io_input.py
+Enter text: madam
+Yes, it is a palindrome
+$ python3 io_input.py
+Enter text: racecar
+Yes, it is a palindrome
+```
+
+## 文件
+
+```python
+poem = '''\
+Programming is fun
+When the work is done
+if you wanna make your work also fun:
+ use Python!
+'''
+# 打开文件以编辑('w'riting)
+f = open('poem.txt', 'w') # 常用的打开模式是阅读模式( 'r' ),写入模式( 'w' )和追加模式( 'a' )。更多模式查看 help(open)
+# 向文件中编写文本
+f.write(poem)
+# 关闭文件
+f.close()
+# 如果没有特别指定,
+# 将假定启用默认的阅读('r'ead)模式
+f = open('poem.txt')  # 默认即是阅读模式，不需要指定
+while True:
+    line = f.readline()  # 读取一行，同时结尾还包含了换行符！
+    # 零长度指示 EOF
+    if len(line) == 0:  # 空字符串返回时，表示到达了文件末尾
+        break
+    # 每行(`line`)的末尾
+    # 都已经有了换行符
+    # 因为它是从一个文件中进行读取的
+    print(line, end='')
+# 关闭文件
+f.close() # ※
+```
+
+输出:
+
+```
+$ python3 io_using_file.py
+Programming is fun
+When the work is done
+if you wanna make your work also fun:
+ use Python!
+```
+
+## Pickle
+
+Python 提供了一个叫作 的标准模块,通过它你可以将任何纯 Python 对象存储到一个文件中,并在稍后将其取回。这叫作`持久地(Persistently)存储对象`。
+
+```python
+import pickle
+
+# 我们存储相关对象的文件的名称
+shoplistfile = 'shoplist.data'
+# 需要购买的物品清单
+shoplist = ['apple', 'mango', 'carrot']
+# 准备写入文件
+f = open(shoplistfile, 'wb') # 写入、二进制模式
+# 转储对象至文件
+pickle.dump(shoplist, f)  # 这过程称为封装
+f.close()
+# 清除 shoplist 变量
+del shoplist
+# 重新打开存储文件
+f = open(shoplistfile, 'rb')
+# 从文件中载入对象
+storedlist = pickle.load(f)  # 这过程称为拆封
+print(storedlist)
+```
+
+输出:
+
+```
+$ python io_pickle.py
+['apple', 'mango', 'carrot']
+```
+
+## Unicode
+
+> 注意:如果你正在使用 Python 2,我们又希望能够读写其它非英语语言,我们需要使用`unicode`类型,它全都以字母`u`开头,例如`u"hello	world"`	。
+
+```python
+# encoding=utf-8
+import io
+
+f = io.open("abc.txt", "wt", encoding="utf-8")  # 指定编码为utf-8
+f.write(u"Imagine non-English language here")
+f.close()
+text = io.open("abc.txt", encoding="utf-8").read()
+print(text)
+```
+
+# 异常
+
+## 错误
+## 异常
+## 处理异常
+
+我们可以通过使用`try..except`来处理异常状况。
+
+```python
+try:
+    text = input('Enter something --> ')
+except EOFError:  # 至少一个except字句
+    print('Why did you do an EOF on me?')
+except KeyboardInterrupt:
+    print('You cancelled the operation.')
+else:  # else 子句将在没有发生异常的时候执行。
+    print('You entered {}'.format(text))
+```
+
+输出:
+
+```
+# Press ctrl + d
+$ python exceptions_handle.py
+Enter something --> Why did you do an EOF on me?
+# Press ctrl + c
+$ python exceptions_handle.py
+Enter something --> ^CYou cancelled the operation.
+$ python exceptions_handle.py
+Enter something --> No exceptions
+You entered No exceptions
+```
+
+## 抛出异常
+
+你可以通过`raise`语句来引发一次异常。引发的错误或异常必须是直接或间接从属于`Exception`(异常) 类的派生类。
+
+```python
+# encoding=UTF-8
+
+class ShortInputException(Exception): # 必须继承Exception基类
+    '''一个由用户定义的异常类'''
+
+    def __init__(self, length, atleast):
+        Exception.__init__(self)
+        self.length = length
+        self.atleast = atleast
+
+
+try:
+    text = input('Enter something --> ')
+    if len(text) < 3:
+        raise ShortInputException(len(text), 3) # 抛出文本长度小于最小长度限制的异常
+# 其他工作能在此处继续正常运行
+except EOFError:
+    print('Why did you do an EOF on me?')
+except ShortInputException as ex: #  ex 是 ShortInputException 的别名!
+    print(('ShortInputException: The input was ' +
+           '{0} long, expected at least {1}')
+          .format(ex.length, ex.atleast))  # 调用异常类对象的字段
+else:
+    print('No exception was raised.')  # 无异常抛出进入else
+
+```
+
+输出:
+
+```
+$ python exceptions_raise.py
+Enter something --> a
+ShortInputException: The input was 1 long, expected at least 3
+$ python exceptions_raise.py
+Enter something --> abc
+No exception was raised.
+```
+
+## Try ... Finally
+
+能确保读取文件时，无论是否发生异常，都可以正确关闭！
+
+```python
+import sys
+import time
+
+f = None
+try:
+    f = open("poem.txt")
+    # 我们常用的文件阅读风格
+    while True:
+        line = f.readline()  # 读取一行
+        if len(line) == 0:  # 判断是否到达文件结尾
+            break
+        print(line, end='')
+        sys.stdout.flush() # 使得上一个print能立即打印到屏幕
+        print("Press ctrl+c now")
+        # 为了确保它能运行一段时间
+        time.sleep(2)  # 休眠2秒
+except IOError:
+    print("Could not find file poem.txt")
+except KeyboardInterrupt:
+    print("!! You cancelled the reading from the file.")
+finally:  # 无论是否有异常抛出 都会进入finally
+    if f:
+        f.close()
+    print("(Cleaning up: Closed the file)")
+```
+
+输出:
+
+```
+$ python exceptions_finally.py
+Programming is fun
+Press ctrl+c now
+^C!! You cancelled the reading from the file.
+(Cleaning up: Closed the file)
+```
+
+## 	with 语句
+
+在`try`块中获取资源,然后在`finally`块中释放资源是一种常见的模式。因此,还有一个`with`语句使得这一过程可以以一种干净的姿态得以完成。
+
+```python
+with open("poem.txt") as f:
+    for line in f:
+        print(line, end='')
+```
+
+我们将关闭文件的操作交由`with open`来自动完成。它总会在代码块开始之前调用`thefile.__enter__`函数,并且总会在代码块执行完毕之后调用`thefile.__exit__`。因此,我们在`finally`代码块中编写的代码应该格外留心`__exit__`方法的自动操作。这能够帮助我们避免重复显式使用`try..finally`语句。
+
+# 标准库
+
+## sys 模块
+
+`sys 模块`包括了一些针对特定系统的功能。
+
+## 日志模块
+
+```python
+import os  # os 模块用以和操作系统交互
+import platform # platform 模块用以获取平台——操作系统——的信息
+import logging # logging 模块用来记录(Log)信息。
+
+# 通过检查platform.platform()，来确定使用的操作系统
+if platform.platform().startswith('Windows'):
+    logging_file = os.path.join(os.getenv('HOMEDRIVE'),  # 主驱动盘
+                                os.getenv('HOMEPATH'),  # 主文件夹
+                                'test.log')  # 用于存储信息的文件名
+else:
+    logging_file = os.path.join(os.getenv('HOME'),
+                                'test.log')
+print("Logging to", logging_file) # 打印日志即将保存的位置路径
+#以特定格式记录日志
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s : %(levelname)s : %(message)s',
+    filename=logging_file,
+    filemode='w',
+)
+logging.debug("Start of the program")  # 调试信息
+logging.info("Doing something")  # 提醒信息
+logging.warning("Dying now")  # 警告信息，还有很多
+```
+
+输出:
+
+```python
+$ python stdlib_logging.py
+Logging to /Users/swa/test.log
+$ cat /Users/swa/test.log
+2014-03-29 09:27:36,660 : DEBUG : Start of the program
+2014-03-29 09:27:36,660 : INFO : Doing something
+2014-03-29 09:27:36,660 : WARNING : Dying now
+```
+
+## 每周模块系列
+
+进一步探索标准库的最好方法是阅读由 Doug Hellmann 撰写的优秀的`Python Module of the Week`系列(你还可以阅读它的实体书或是阅读 Python 官方文档)。
+
+# 更多
+
+## 传递元组
+
+从一个函数中返回两个不同的值：
+
+```bash
+>>> def get_error_details():
+...     return (2, 'details')
+...
+>>> errnum, errstr = get_error_details()
+>>> errnum
+2
+>>> errstr
+'details'
+```
+
+要注意到`a,	b = <some expression>`的用法会将表达式的结果解释为具有两个值的一个元组。
+
+这也意味着在 Python 中交换两个变量的最快方法是:
+
+```bash
+>>> a = 5; b = 8
+>>> a, b
+(5, 8)
+>>> a, b = b, a
+>>> a, b
+(8, 5)
+```
+
+## 特殊方法
+
+诸如`__init__`和`__del__`等一些方法对于类来说有特殊意义。
+
+下面的表格列出了一些有用的特殊方法。如果你想了解所有的特殊方法,请参阅手册。
+
+- `_init__(self, ...)` 这一方法在新创建的对象被返回准备使用时被调用。
+- `__del__(self)` 这一方法在对象被删除之前调用(它的使用时机不可预测,所以避免使用它)
+- `__str__(self)` 当我们使用 print 函数时,或 str() 被使用时就会被调用。
+- `__lt__(self,	other)` 当小于运算符(<)被使用时被调用。类似地,使用其它所有运算符(+、> 等等)时都会有特殊方法被调用。
+- `__getitem__(self, key)`  使用 x[key] 索引操作时会被调用。
+- `__len__(self)` 当针对序列对象使用内置 len() 函数时会被调用
+
+
+## 单语句块
+
+如果你的语句块只包括单独的一句语句,那么你可以在同一行指定它,而不使用缩进
+
+```bash
+>>> flag = True
+>>> if flag: print('Yes')
+...
+Yes
+```
+
+## Lambda 表格
+
+`lambda 语句`可以创建一个新的函数对象。从本质上说,lambda 需要一个参数,后跟一个表达式作为函数体,这一表达式执行的值将作为这个新函数的返回值。
+
+```python
+points = [{'x': 2, 'y': 3},
+          {'x': 4, 'y': 1}]
+points.sort(key=lambda i: i['y']) #lambda后面第一个i是传入函数体的形参，：后面的是函数体； 本例中 i 是list中的一个字典
+print(points)
+```
+
+输出:
+
+```
+$ python more_lambda.py
+[{'y': 1, 'x': 4}, {'y': 3, 'x': 2}]
+```
+
+要注意到一个 list 的 sort 方法可以获得一个 key 参数,用以决定列表的排序方式(通常我们只知道升序与降序)。在我们的案例中,我们希望进行一次自定义排序,为此我们需要编写一个函数,但是又不是为函数编写一个独立的 def 块,只在这一个地方使用,因此我们使用	Lambda	表达式来创建一个新函数。
+
+## 列表推导
+
+列表推导(List Comprehension)用于从一份现有的列表中得到一份新列表。想象一下,现在你已经有了一份数字列表,你想得到一个相应的列表,其中的数字在大于 2 的情况下将乘以2。列表推导就是这类情况的理想选择。
+
+```python
+listone = [2, 3, 4]
+listtwo = [2*i for i in listone if i > 2] # 并不会改变listone
+print(listtwo)
+```
+
+输出:
+
+```
+$ python more_list_comprehension.py
+[6, 8]
+```
+
+在本案例中,当满足了某些条件时( if	i >	2 ),我们进行指定的操作( 2*i ),以此来获得一份新的列表。要注意到原始列表依旧保持不变。使用列表推导的优点在于,当我们使用循环来处理列表中的每个元素并将其存储到新的列表中时时,它能减少样板(Boilerplate)代码的数量。
+
+## 在函数中接收元组与字典
+
+有一种特殊方法,即分别使用`*`或`**`作为元组或字典的前缀,来使它们作为一个参数为函数所接收。当函数需要一个可变数量的实参时,这将颇为有用。
+
+```bash
+>>> def powersum(power, *args):
+... '''Return the sum of each argument raised to the specified power.'''
+... total = 0
+... for i in args:
+... total += pow(i, power)
+... return total
+...
+>>> powersum(2, 3, 4)
+25
+>>> powersum(2, 10)
+100
+```
+
+因为我们在`args`变量前添加了一个`*`前缀,函数的所有其它的额外参数都将传递到`args`中,并作为一个元组予以储存。如果采用的是`**`前缀,则额外的参数将被视为字典的键值—值配对。
+
+## assert 语句
+
+`assert 语句`用以断言(Assert)某事是真的。例如说你非常确定你正在使用的列表中至少包含一个元素,并想确认这一点,如果其不是真的,就抛出一个错误, assert 语句就是这种情况下的理想选择。当语句断言失败时,将会抛出`AssertionError`。
+
+```bash
+>>> mylist = ['item']
+>>> assert len(mylist) >= 1
+>>> mylist.pop()
+'item'
+>>> assert len(mylist) >= 1
+Traceback (most recent call last):
+ File "<stdin>", line 1, in <module>
+AssertionError
+```
+
+你应该明智地选用`assert 语句`。在大多数情况下,它好过捕获异常,也好过定位问题或向用户显示错误信息然后退出。
+
+## 装饰器
+
+装饰器(Decorators)是应用包装函数的快捷方式。这有助于将某一功能与一些代码一遍又一遍地“包装”。举个例子,我为自己创建了一个 retry 装饰器,这样我可以将其运用到任何函数之中,如果在一次运行中抛出了任何错误,它就会尝试重新运行,直到最大次数 5 次,并且每次运行期间都会有一定的延迟。这对于你在对一台远程计算机进行网络调用的情况十分有用:
+
+```python
+from time import sleep
+from functools import wraps
+import logging
+
+logging.basicConfig()
+log = logging.getLogger("retry")
+
+
+def retry(f):
+    @wraps(f)
+    def wrapped_f(*args, **kwargs):
+        MAX_ATTEMPTS = 5
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            try:
+                return f(*args, **kwargs)
+            except:
+                log.exception("Attempt	%s/%s	failed	:	%s",
+                              attempt,
+                              MAX_ATTEMPTS,
+                              (args, kwargs))
+                sleep(10 * attempt)
+        log.critical("All	%s	attempts	failed	:	%s",
+                     MAX_ATTEMPTS,
+                     (args, kwargs))
+
+    return wrapped_f
+
+
+counter = 0
+
+
+@retry  # 装饰器的语法糖 类似于 save_to_database = retry(save_to_database)
+def save_to_database(arg):
+    print("Write	to	a	database	or	make	a	network	call	or	etc.")
+    print("This	will	be	automatically	retried	if	exception	is	thrown.")
+    global counter
+    counter += 1
+    #	这将在第一次调用时抛出异常
+    #	在第二次运行时将正常工作(也就是重试)
+    if counter < 2:
+        raise ValueError(arg)
+
+
+if __name__ == '__main__':
+    save_to_database("Some	bad	value")
+```
+
+输出:
+
+```
+$	python	more_decorator.py
+Write	to	a	database	or	make	a	network	call	or	etc.
+This	will	be	automatically	retried	if	exception	is	thrown.
+ERROR:retry:Attempt	1/5	failed	:	(('Some	bad	value',),	{})
+Traceback	(most	recent	call	last):
+		File	"more_decorator.py",	line	14,	in	wrapped_f
+				return	f(*args,	**kwargs)
+		File	"more_decorator.py",	line	39,	in	save_to_database
+				raise	ValueError(arg)
+ValueError:	Some	bad	value
+Write	to	a	database	or	make	a	network	call	or	etc.
+This	will	be	automatically	retried	if	exception	is	thrown.
+```
+
+它是如何工作的
+
+请参阅:
+
+https://foofish.net/python-decorator.html
+
+http://toumorokoshi.github.io/dry-principles-through-python-decorators.html
+
+
+# 如何翻译本书
+
+本书的完整源代码可在	https://github.com/swaroopch/byte-of-python	获得。
 
 
 
