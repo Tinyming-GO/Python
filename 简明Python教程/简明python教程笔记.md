@@ -163,7 +163,7 @@ This is a string. This continues the string.
 - - 将数字的位向左移动指定的位数。(每个数字在内存中以二进制数表示,即 0 和 1 )
 - - 2 << 2 输出 8 。 2 用二进制数表示为 10 。
 - - 向左移 2 位会得到 1000 这一结果,表示十进制中的 8 。
-- (右移)
+- \>> (右移)
 - & (按位与)
 - - 5 & 3 输出 1 。
 - | (按位或)
@@ -245,7 +245,7 @@ Done
 一个最小规模且有效的 `if 语句` 是这样的:
 
 ```python
-if True:
+if True: # 注意：True首字母一定是大写！
  	print('Yes, it is true')
 ```
 
@@ -267,7 +267,7 @@ while running:
     else:
         print('No,	it	is	a	little	lower	than	that.')
 else:
-    print('The	while	loop	is	over.')
+    print('The	while	loop	is	over.')  # 跳出循环时，就一定会执行这句
 # 在这里你可以做你想做的任何事
 print('Done')
 ```
@@ -307,6 +307,12 @@ The for loop is over
 ```
 
 另外需要注意的是,`range()`每次只会生成一个数字,如果你希望获得完整的数字列表,要在使用`range()`时调用`list()`。例如下面这样: `list(range(5))`,它将会返回 [0, 1, 2, 3, 4] 。
+
+```python
+print(range(1, 5)) # python2 输出：range(1, 5)
+print(range(1, 5)) # python3 输出：[1, 2, 3, 4]
+print(list(range(1, 5))) # python2 python3 都输出：[1, 2, 3, 4]
+```
 
 ## 	break 语句
 
@@ -424,11 +430,11 @@ def total(a=5, *numbers, **phonebook):
         print('single_item', single_item)
 
     # 遍历字典中的所有项目
-    for first_part, second_part in phonebook.items():
+    for first_part, second_part in phonebook.items(): # .items() 一定要加！！
         print(first_part, second_part)
 
 
-print(total(10, 1, 2, 3, Jack=1123, John=2231, Inge=1560))
+print(total(10, 1, 2, 3, Jack=1123, John=2231, Inge=1560))  # 函数没有显式的return，默认return None
 ```
 
 输出:
@@ -1013,8 +1019,8 @@ class Robot:
         没问题,你做得到。"""
         print("Greetings, my masters call me {}.".format(self.name))
 
-    @classmethod
-    def how_many(cls):  # 定义一个属于类的方法！！
+    @classmethod  # 将下面的方法how_many定义为类方法！所有对象共享该方法！
+    def how_many(cls):  # 定义一个属于类的方法！！未加前缀__的类方法都是公开的
         """打印出当前的人口数量"""
         print("We have {:d} robots.".format(cls.population))
 
