@@ -124,3 +124,34 @@ if 'replace' == arg_1:
     b = a.replace('a', 'A')
     print("替换后的新对象：%s" % b)  # Abc (对于不变对象来说  调用任何方法 并不改变该对象内容  只是生成了一个新的对象)
     print("旧对象依旧不变：%s" % a)  # abc
+
+if 'yield' == arg_1:
+    # 带有 yield 的函数在 Python 中被称之为 generator（生成器）
+    # 输出斐波那契數列前 N 个数
+    def fab(max):
+        n, a, b = 0, 0, 1
+        while n < max:
+            print(b)
+            a, b = b, a + b
+            n = n + 1
+
+
+    fab(5)
+
+
+    # 直接在 fab 函数中用 print 打印数字会导致该函数可复用性较差，因为 fab 函数返回 None，其他函数无法获得该函数生成的数列。
+
+    # 使用 yield 输出斐波那契數列前 N 个数
+    def fab(max):
+        n, a, b = 0, 0, 1
+        while n < max:
+            yield b  # 使用yield
+            # print(b)
+            a, b = b, a + b
+            n = n + 1
+
+
+    print(fab(5))  # <generator object fab at 0x7ff376d44af0>
+
+    for n in fab(5):
+        print(n)
