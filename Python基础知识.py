@@ -155,3 +155,35 @@ if 'yield' == arg_1:
 
     for n in fab(5):
         print(n)
+
+if '@property' == arg_1:
+    class Person():
+        @property
+        def get_name(self):
+            print('')
+
+if 'object' == arg_1:
+    ## 实际上在python 3 中已经默认就帮你加载了object了（即便你没有写上object）
+    class Person():
+        '''
+        不带object
+        '''
+        name = 'xiaoming'
+
+
+    class Animal(object):
+        """
+        带有object
+        """
+        name = "xiaohong"
+
+
+    x = Person()
+    print("Person", dir(x))         #python 2.7 Person ['__doc__', '__module__', 'name']
+
+    y = Animal()
+    print("Animal", dir(x))         #python 3  Animal ['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'name']
+
+
+## https://github.com/tangyibo/DataMigrationTool/blob/master/dbwriter/mysql_writer.py
+## https://github.com/Lvzwq/migratedb
